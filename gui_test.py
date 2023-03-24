@@ -1,36 +1,56 @@
-import PySimpleGUI as sg
+import PySimpleGUI
 
-	
-sg.theme('Black')
+PySimpleGUI.theme('Black')
 
-layout = [[sg.Text('Enter the mass of the asteroid in kg:')],
-		[sg.Input(key='asteroidMass')],
-        [sg.Text('Enter the mass of the gravity tractor in kg:')],
-		[sg.Input(key='gravityTractorMass')],
-        [sg.Text('Enter the distance between the asteroid and the GT in m:')],
-		[sg.Input(key='distance')],
-        [sg.Text('Enter the time left in seconds:')],
-		[sg.Input(key='timeLeft')],
-        [sg.Text('Enter the time left for levitation in seconds:')],
-		[sg.Input(key='timeForLevitatingLeft')],
-		[sg.Button('Calculate')],
-        [sg.Text('The deflection after'),sg.Text(key='-OUTPUT-'),sg.Text('seconds is:'),sg.Text(key='-OUTPUT-'), sg.Text('meters')]]
 
-window = sg.Window('Asteroid deflection with Gravity Tractor', layout)
+
+layout = [[PySimpleGUI.Text('Enter the mass of the asteroid in kg:'),PySimpleGUI.Input(key='-asteroidMass-')],
+        [PySimpleGUI.Text('Enter the mass of the gravity tractor in kg:'), PySimpleGUI.Input(key='-gravityTractorMass-')],
+        [PySimpleGUI.Text('Enter the distance between the asteroid and the GT in m:'), PySimpleGUI.Input(key='-distance-')],
+        [PySimpleGUI.Text('Enter the time left in seconds:'), PySimpleGUI.Input(key='-timeLeft-')],
+        [PySimpleGUI.Text('Enter the time left for levitation in seconds:'), PySimpleGUI.Input(key='-timeForLevitatingLeft-')],
+		[PySimpleGUI.Button('Calculate')],
+        [PySimpleGUI.Text('The deflection after'),PySimpleGUI.Text(key='-OUTPUT-'),PySimpleGUI.Text('seconds is:'),PySimpleGUI.Text(key='-OUTPUT2-'), PySimpleGUI.Text('meters')]]
+
+window = PySimpleGUI.Window('Asteroid deflection with Gravity Tractor', layout, resizable=True, size=(600, 350))
+
+
+#gravitational constant
+G=6.67*(10**(-11))
+
 
 
 while True:
+	
 	event, values = window.read()
 	print(event, values)
-	
+
+	#
+	#if event == '-asteroidMass-':
+		#if values['-asteroidMass-'][-1] not in ('0123456789'):
+			#PySimpleGUI.popup("Only digits allowed")
+			#window['-OUTPUT-'].update(values['-asteroidMass-'][:-1])
+	  	
 	
 	if event == 'Calculate':
-		# Update the "output" text element
-		# to be the value of "input" element
-		window['-OUTPUT-'].update(values['asteroidMass'])
+		#gravitational force between the asteroid and the GT
+		fGravitation=G*((int(values['-asteroidMass-'])*int(values['-gravityTractorMass-']))/(int(values['-distance-'])**2))
 
-    #megnezni hogy ez kell e
-	if event == sg.WIN_CLOSED:
+		#acceleration of the asteroid
+		massTogether=int(values['-asteroidMass-'])+int(values['-gravityTractorMass-'])
+		aNEO=fGravitation/massTogether
+
+		#10 év = 315569260 másodperc
+		#1 év = 31556926 másodperc
+		#deflection: delta X
+		deflection=1.5*aNEO*int(values['-timeForLevitatingLeft-'])*((2*int(values['-timeLeft-']))-int(values['-timeForLevitatingLeft-']))
+		roundedDeflection=round(deflection,3)
+
+		asd=int(values['-timeForLevitatingLeft-'])+6
+		window['-OUTPUT-'].update(values['-timeLeft-'])
+		window['-OUTPUT2-'].update(roundedDeflection)
+
+	if event == PySimpleGUI.WIN_CLOSED:
 		break
 
 window.close()
