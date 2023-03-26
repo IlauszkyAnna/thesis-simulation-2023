@@ -1,6 +1,6 @@
 import PySimpleGUI
 
-PySimpleGUI.theme('Black')
+PySimpleGUI.theme('BlueMono')
 
 
 
@@ -10,7 +10,7 @@ layout = [[PySimpleGUI.Text('Enter the mass of the asteroid in kg:'),PySimpleGUI
         [PySimpleGUI.Text('Enter the time left in seconds:'), PySimpleGUI.Input(key='-timeLeft-')],
         [PySimpleGUI.Text('Enter the time left for levitation in seconds:'), PySimpleGUI.Input(key='-timeForLevitatingLeft-')],
 		[PySimpleGUI.Button('Calculate')],
-        [PySimpleGUI.Text('The deflection after'),PySimpleGUI.Text(key='-OUTPUT-'),PySimpleGUI.Text('seconds is:'),PySimpleGUI.Text(key='-OUTPUT2-'), PySimpleGUI.Text('meters')]]
+        [PySimpleGUI.Text('The deflection after'),PySimpleGUI.Text(key='-OUTPUT-',text_color='Red'),PySimpleGUI.Text('seconds is:'),PySimpleGUI.Text(key='-OUTPUT2-', text_color='Red'), PySimpleGUI.Text('meters')]]
 
 window = PySimpleGUI.Window('Asteroid deflection with Gravity Tractor', layout, resizable=True, size=(600, 350))
 
