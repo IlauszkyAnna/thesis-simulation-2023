@@ -21,4 +21,5 @@ aNEO=fGravitation/massTogether
 #deflection: delta X
 deflection=1.5*aNEO*timeForLevitatingLeft*((2*timeLeft)-timeForLevitatingLeft)
 roundedDeflection=round(deflection,3)
+
 print("The deflection after", timeLeft, "seconds is: ", roundedDeflection, "meters")
