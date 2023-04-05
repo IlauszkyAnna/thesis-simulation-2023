@@ -14,6 +14,21 @@ root.maxsize(700, 700)
 #gravitational constant
 G=6.67*(10**(-11))
 
+############################################################################################################################
+#dropdown menu options
+options = [
+"Years",
+"Days",
+"Minutes",
+"Seconds"
+]
+
+dropdown = StringVar()
+dropdown.set(options[0])
+
+dropdown2 = StringVar()
+dropdown2.set(options[0])
+#############################################################################################################################
 def validate_number(key):
     return key.isdigit()
 
@@ -25,13 +40,16 @@ def calculate_event():
     massTogether=int(asteroidMass.get())+int(gravityTractorMass.get())
     aNEO=fGravitation/massTogether
 
-    #10 év = 315569260 másodperc
-    #1 év = 31556926 másodperc
     #deflection: delta X
-    deflection=1.5*aNEO*int(timeForLevitatingLeft.get())*((2*(int(timeLeft.get())))-int(timeForLevitatingLeft.get()))
+    chosenTimeLeft = dropdown.get()
+    chosenTimeLeft2 = dropdown2.get()
+    convertedTimeLeft = convert_time(int(timeLeft.get()),chosenTimeLeft)
+    convertedHoveringTimeLeft = convert_time(int(timeForLevitatingLeft.get()),chosenTimeLeft2)
+    print(convertedTimeLeft)
+    print(convertedHoveringTimeLeft)
+    deflection=1.5*aNEO*convertedHoveringTimeLeft*((2*(convertedTimeLeft))-convertedHoveringTimeLeft)
     roundedDeflection=round(deflection,3)
-    #messagebox.showinfo("Deflection:", roundedDeflection)
-    answer="The deflection after " + str(timeLeft.get()) + " seconds is: " + str(roundedDeflection) + " meters"
+    answer="The deflection after " + str(timeLeft.get()) + " " + dropdown.get().lower()+ " is: " + str(roundedDeflection) + " meters"
     deflectionAnswerLabel.config(text=answer)
     deflectionAnswerLabel["state"] = "normal"
     
@@ -41,6 +59,20 @@ def allow_calculation(event):
         calculate_button.configure(state=DISABLED)
     else:
         calculate_button.configure(state=NORMAL)
+
+def convert_time(writtenTime, chosenTimeLeft):
+    match chosenTimeLeft:
+        case "Years":
+            return writtenTime*365*24*60*60
+        case "Days":
+            return writtenTime*24*60*60
+        case "Minutes":
+            return writtenTime*60
+        case "Seconds":
+            return writtenTime
+
+
+
 
 #TODO
 #############################################################
@@ -52,10 +84,16 @@ Label(root, text="Asteroid deflection with Gravity Tractor", font=('Helvetica 20
 Label(root, text='Enter the mass of the asteroid in kg:', bg="light blue").grid(row=1, column=1, padx=10, pady=10)
 Label(root, text='Enter the mass of the gravity tractor in kg:', bg="light blue").grid(row=2, column=1, padx=10, pady=10)
 Label(root, text='Enter the distance between the asteroid and the GT in meters:', bg="light blue").grid(row=3, column=1, padx=10, pady=10)
-Label(root, text='Enter the time left in seconds:', bg="light blue").grid(row=4, column=1, padx=10, pady=10)
-Label(root, text='Enter the time left for levitation in seconds:', bg="light blue").grid(row=5, column=1, padx=10, pady=10)
+Label(root, text='Enter the time left:', bg="light blue").grid(row=4, column=1, padx=10, pady=10)
+Label(root, text='Enter the time left for hovering:', bg="light blue").grid(row=5, column=1, padx=10, pady=10)
 deflectionAnswerLabel=Label(root, text='Here comes the aswer', bg="light blue")
-deflectionAnswerLabel.grid(row=7, column=1, padx=10, pady=10, columnspan=2) 
+deflectionAnswerLabel.grid(row=7, column=1, padx=10, pady=10, columnspan=2)
+dateChanger1 = OptionMenu(root, dropdown, *options)
+dateChanger1.grid(row=4, column=3, padx=10, pady=10)
+dateChanger1.config(width=6)
+dateChanger2 = OptionMenu(root, dropdown2, *options)
+dateChanger2.grid(row=5, column=3, padx=10, pady=10)
+dateChanger2.config(width=6)
 
 asteroidMass = StringVar(root)
 entry = Entry(root, textvariable=asteroidMass, width=25, validate="key",\
@@ -67,7 +105,7 @@ entry = Entry(root, textvariable=gravityTractorMass, width=25, validate="key",\
             validatecommand=(root.register(validate_number), "%S"))
 entry.grid(row=2, column=2, padx=10, pady=10, sticky=W)
  
-distance =StringVar(root)
+distance = StringVar(root)
 entry = Entry(root, textvariable=distance, width=25, validate="key",\
             validatecommand=(root.register(validate_number), "%S"))
 entry.grid(row=3, column=2, padx=10, pady=10, sticky=W)
@@ -77,7 +115,7 @@ entry = Entry(root, textvariable=timeLeft, width=25, validate="key",\
             validatecommand=(root.register(validate_number), "%S"))
 entry.grid(row=4, column=2, padx=10, pady=10, sticky=W)
  
-timeForLevitatingLeft =StringVar(root)
+timeForLevitatingLeft = StringVar(root)
 entry = Entry(root, textvariable=timeForLevitatingLeft, width=25, validate="key",\
             validatecommand=(root.register(validate_number), "%S"))
 entry.grid(row=5, column=2, padx=10, pady=10, sticky=W)
