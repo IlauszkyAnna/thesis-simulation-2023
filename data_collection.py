@@ -7,6 +7,7 @@ class FrameDataCollection:
                 self.root = root
                 self.frame = frame
 
+
                 options = [
                     "Years",
                     "Days",
@@ -60,7 +61,7 @@ class FrameDataCollection:
                             validatecommand=(self.root.register(self.validate_number), "%S"))
                 entry.grid(row=5, column=2, padx=10, pady=10, sticky=W)
 
-                self.calculate_button = Button(self.frame, text="CALCULATE", width=70, command = self.calculate_event, state=DISABLED, fg='black', bg='slate grey')
+                self.calculate_button = Button(self.frame, text="CALCULATE", width=70, command = self.calculate_event, state=DISABLED, disabledforeground="light gray", fg='black', bg='slate grey')
                 self.calculate_button.grid(row=6, column=1, padx=10, pady=10, columnspan=2, sticky='w')
 
                 self.deflectionAnswerLabel=Label(self.frame, text='Here comes the answer', bg="light blue")
@@ -68,7 +69,6 @@ class FrameDataCollection:
 
                 self.root.bind("<KeyRelease>", self.allow_calculation)
 
-        
         def validate_number(self,key):
             return key.isdigit()
         
