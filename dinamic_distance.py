@@ -3,6 +3,10 @@ from base import *
 from modified_trajectory import *
 from data_collection import *
 import time
+import tkinter.messagebox
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class FrameDinamicDistance:
     def __init__(self, root, frame):
@@ -27,7 +31,7 @@ class FrameDinamicDistance:
         
         Label(self.frame, text='Enter the mass of the asteroid in kg:', bg="light blue").grid(row=1, column=1, padx=10, pady=10, sticky='w')
         Label(self.frame, text='Enter the mass of the gravity tractor in kg:', bg="light blue").grid(row=2, column=1, padx=10, pady=10, sticky='w')
-        Label(self.frame, text='Enter the minimum and maximum distance between the asteroid and the GT:', bg="light blue").grid(row=3, column=1, padx=10, pady=10, sticky='w')
+        Label(self.frame, text='Enter the maximum distance between the asteroid and the GT:', bg="light blue").grid(row=3, column=1, padx=10, pady=10, sticky='w')
         Label(self.frame, text='Enter the time left:', bg="light blue").grid(row=4, column=1, padx=10, pady=10,sticky='w')
         Label(self.frame, text='Enter the time left for hovering:', bg="light blue").grid(row=5, column=1, padx=10, pady=10, sticky='w')
 
@@ -48,7 +52,7 @@ class FrameDinamicDistance:
                     validatecommand=(self.root.register(self.validate_number), "%S"))
         entry.grid(row=2, column=2, padx=10, pady=10, sticky=W)
                 
-        self.slider = Scale(self.frame, from_=0, to=1000, length=250,orient=HORIZONTAL)
+        self.slider = Scale(self.frame, from_=0, to=1000, length=250,orient=HORIZONTAL, resolution=10)
         self.slider.set(500)
         self.slider.grid(row=3, column=2, padx=10, pady=10, sticky=W, columnspan=2)
 
@@ -92,26 +96,60 @@ class FrameDinamicDistance:
         f.write("Max distance: " + str(self.slider.get()) + "\n")
         f.write("Time left: " + str(self.convert_time(int(self.timeLeft.get()),self.dropdown.get())) + "\n")
         f.write("Time left for levitating: " + str(self.convert_time(int(self.timeForLevitatingLeft.get()),self.dropdown2.get())) + "\n")
-        #for i in range(0,)
+        convertedRemainingTime = self.convert_to_days(int(self.timeLeft.get()),self.dropdown.get())
+        convertedLevitatingTime = self.convert_to_days(int(self.timeForLevitatingLeft.get()),self.dropdown2.get())
+        # 1 day = 86 400 sec
+
+        
+
+        figure = plt.Figure(figsize=(5, 4), dpi=100)
+        ax = figure.add_subplot(111)
+        line = FigureCanvasTkAgg(figure, self.root)
+        line.get_tk_widget().grid(row=1, column=4, padx=10, pady=10)
+        ax.set_xlabel("Days")
+        ax.set_ylabel("Meters")  
+        ax.set_title('Time Vs. Deflection')
+
+        for distance in range(10, int(self.slider.get())+1, 10):
+            plotTime = []
+            plotDistance = []
+            for i in range(0,convertedRemainingTime+1):
+                plotTime.append(i)
+                if i > convertedLevitatingTime:
+                    calculatedValue = self.calculate_deflection(i*86400, convertedLevitatingTime*86400, distance)
+                    f.write(str(i) + "  " + str(calculatedValue) + "\n")
+                    plotDistance.append(calculatedValue)
+                else:
+                    calculatedValue = self.calculate_deflection(i*86400, i*86400, distance)
+                    f.write(str(i) + "  " + str(calculatedValue) + "\n")
+                    plotDistance.append(calculatedValue)
+            data = {'time': plotTime, 'distance': plotDistance}  
+            df = pd.DataFrame(data)
+            df = df[['time', 'distance']].groupby('time').sum()
+            #ax.set_color_cycle(['red', 'black', 'yellow'])
+            df.plot(kind='line', legend=True, ax=ax, color='r', fontsize=10)
+            ax.legend().remove()
+
+
         f.close()
         return filename
     
-    def convert_to_years(time, unit):
+    def convert_to_days(self, time, unit):
         if unit == 'Years':
-            return time
+            return time * 365
         elif unit == 'Days':
-            return time / 365
+            return time
         elif unit == 'Minutes':
-            return time / (365 * 24 * 60)
+            return time / (24 * 60)
         elif unit == 'Seconds':
-            return time / (365 * 24 * 3600)
+            return time / (24 * 3600)
         else:
-            print("Invalid")
+            print("Not valid")
             return None
 
-    def calculate_deflection(self, timeLeft, timeLeftLev):
+    def calculate_deflection(self, timeLeft, timeLeftLev, distance):
         #gravitational force between the asteroid and the GT
-        fGravitation=self.G*((int(self.asteroidMass.get())*int(self.gravityTractorMass.get()))/(int(self.slider.get())**2))
+        fGravitation=self.G*((int(self.asteroidMass.get())*int(self.gravityTractorMass.get()))/(distance**2))
 
         #acceleration of the asteroid
         massTogether=int(self.asteroidMass.get())+int(self.gravityTractorMass.get())
@@ -119,25 +157,22 @@ class FrameDinamicDistance:
         aNEO=fGravitation/massTogether
 
         #deflection: delta X
-        chosenTimeLeft = self.dropdown.get()
-        chosenTimeLeft2 = self.dropdown2.get()
-        convertedTimeLeft = self.convert_time(timeLeft,chosenTimeLeft)
-        convertedHoveringTimeLeft = self.convert_time(timeLeftLev,chosenTimeLeft2)
-        deflection=1.5*aNEO*convertedHoveringTimeLeft*((2*(convertedTimeLeft))-convertedHoveringTimeLeft)
-        roundedDeflection=round(deflection,3)
+        deflection=1.5*aNEO*timeLeftLev*((2*(timeLeft))-timeLeftLev)
+        roundedDeflection=round(deflection,6)
         return roundedDeflection
 
 
         
 
     def calculate_event(self):
-        
-        
-        filename = self.create_file()
-        answer="Output file successfully generated: "+ filename
-        self.deflectionAnswerLabel.config(text=answer)
-        self.deflectionAnswerLabel["state"] = "normal"
-        self.create_file()
+        if int(self.timeForLevitatingLeft.get()) > int(self.timeLeft.get()):
+            tkinter.messagebox.showerror(title="Error", message="Time for hovering left should be less, than the overall time left!")
+        else:    
+            filename = self.create_file()
+            answer="Output file successfully generated: "+ filename
+            self.deflectionAnswerLabel.config(text=answer)
+            self.deflectionAnswerLabel["state"] = "normal"
+            self.create_file()
         
 
 
