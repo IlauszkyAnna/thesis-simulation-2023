@@ -126,7 +126,7 @@ class FrameDinamicDistance:
             data = {'time': plotTime, 'distance': plotDistance}  
             df = pd.DataFrame(data)
             df = df[['time', 'distance']].groupby('time').sum()
-            ax.set_color_cycle(['red', 'black', 'yellow'])
+            #ax.set_color_cycle(['red', 'black', 'yellow'])
             df.plot(kind='line', legend=True, ax=ax, color='r', fontsize=10)
             ax.legend().remove()
 

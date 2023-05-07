@@ -9,7 +9,7 @@ class Base:
         self.root = Tk()  # create a root widget
         self.root.title("Asteroid deflection with Gravity Tractor")
         self.root.configure(background="grey")
-        self.root.geometry("1500x1500")
+        #self.root.geometry("1500x1500")
 
 
         self.root.minsize(200, 200)
