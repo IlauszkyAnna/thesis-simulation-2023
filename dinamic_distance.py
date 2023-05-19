@@ -54,7 +54,7 @@ class FrameDinamicDistance:
                     validatecommand=(self.root.register(self.validate_number), "%S"))
         entry.grid(row=2, column=2, padx=10, pady=10, sticky=W)
                 
-        self.slider = Scale(self.frame, from_=250, to=1000, length=250,orient=HORIZONTAL, resolution=10)
+        self.slider = Scale(self.frame, from_=300, to=1000, length=250,orient=HORIZONTAL, resolution=10)
         self.slider.set(500)
         self.slider.grid(row=3, column=2, padx=10, pady=10, sticky=W, columnspan=2)
 
@@ -97,7 +97,7 @@ class FrameDinamicDistance:
     #Then it calculates the deflection daily, which is also written into the file
     #With the calculated values, it plots a graph where the time  and the deflection is represented
     #The deflection is calculated for a couple of different distances between the asteroid and the Gravity Tractor
-    #The distances start from 250 and the deflection is calculated every 10 meters until the chosen distance
+    #The distances start from 300 and the deflection is calculated every 10 meters until the chosen distance
     def create_file(self):
         t = time.localtime()
         current_time = time.strftime("%d%m%Y%H%M%S", t)
@@ -125,7 +125,7 @@ class FrameDinamicDistance:
 
         colors = ['green', 'blue', 'purple', 'orange', 'brown', 'pink', 'gray', 'olive', 'cyan']
 
-        for distance in range(200, int(self.slider.get())+1, 10):
+        for distance in range(300, int(self.slider.get())+1, 10):
             plotTime = []
             plotDistance = []
             for i in range(0,convertedRemainingTime+1):
